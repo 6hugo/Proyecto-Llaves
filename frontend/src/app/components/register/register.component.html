@@ -1,0 +1,103 @@
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-[#111318]">
+  <div
+    class="max-w-md w-full space-y-8 bg-white dark:bg-[#1a212e] p-8 rounded-xl border border-[#dbdfe6] dark:border-[#333] shadow-sm">
+    <div class="text-center">
+      <div class="flex justify-center mb-4">
+        <div class="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-3xl">person_add</span>
+        </div>
+      </div>
+      <h2 class="mt-2 text-center text-3xl font-extrabold text-[#111318] dark:text-white">
+        Crear Cuenta
+      </h2>
+      <p class="mt-2 text-center text-sm text-[#616f89] dark:text-gray-400">
+        Únete al futuro de la seguridad automotriz
+      </p>
+    </div>
+
+    <form class="mt-8 space-y-6" (ngSubmit)="onSubmit()">
+      @if (error()) {
+      <div class="rounded-md bg-red-50 dark:bg-red-900/10 p-4 border border-red-200 dark:border-red-900/20">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <span class="material-symbols-outlined text-red-400 text-sm">error</span>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+              {{ error() }}
+            </h3>
+          </div>
+        </div>
+      </div>
+      }
+
+      <div class="rounded-md shadow-sm -space-y-px">
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-[#111318] dark:text-white mb-1">Correo
+            electrónico</label>
+          <div class="relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="material-symbols-outlined text-gray-400 sm:text-sm">mail</span>
+            </div>
+            <input id="email" name="email" type="email" autocomplete="email" required [value]="email()"
+              (input)="updateEmail($any($event.target).value)"
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+              placeholder="nombre@ejemplo.com">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="block text-sm font-medium text-[#111318] dark:text-white mb-1">Contraseña</label>
+          <div class="relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="material-symbols-outlined text-gray-400 sm:text-sm">lock</span>
+            </div>
+            <input id="password" name="password" type="password" autocomplete="new-password" required
+              [value]="password()" (input)="updatePassword($any($event.target).value)"
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+              placeholder="••••••••">
+          </div>
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-[#111318] dark:text-white mb-1">Confirmar
+            Contraseña</label>
+          <div class="relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="material-symbols-outlined text-gray-400 sm:text-sm">lock_reset</span>
+            </div>
+            <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" required
+              [value]="confirmPassword()" (input)="updateConfirmPassword($any($event.target).value)"
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+              placeholder="••••••••">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <button type="submit" [disabled]="loading()"
+          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg">
+          @if (loading()) {
+          <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          </span>
+          Creando Cuenta...
+          } @else {
+          <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <span class="material-symbols-outlined text-primary-300 group-hover:text-primary-400"
+              style="font-size: 18px;">arrow_forward</span>
+          </span>
+          Crear Cuenta
+          }
+        </button>
+      </div>
+
+      <div class="text-sm text-center">
+        <span class="text-[#616f89] dark:text-gray-400">¿Ya tienes una cuenta? </span>
+        <a routerLink="/login" class="font-medium text-primary hover:text-primary/80 transition-colors">
+          Ingresa aquí
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

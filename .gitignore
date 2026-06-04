@@ -1,0 +1,36 @@
+# Backend - Symfony
+/backend/vendor/
+/backend/var/
+/backend/.env.local
+/backend/.env.local.php
+/backend/.env.*.local
+/backend/public/bundles/
+/backend/symfony.lock
+# NO ignorar .env porque contiene valores de desarrollo
+# /backend/.env
+
+# Frontend - Angular
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.angular/
+/frontend/.nx/cache/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Docker - NO ignorar .env del root porque tiene valores de desarrollo
+# .env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+Thumbs.db

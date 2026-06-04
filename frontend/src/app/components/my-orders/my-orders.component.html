@@ -1,0 +1,86 @@
+<div class="max-w-[1440px] mx-auto px-6 md:px-10 lg:px-40 py-12">
+  <div class="mb-10">
+    <h1 class="text-[#111318] dark:text-white text-4xl font-black leading-tight tracking-tight">Pedidos</h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">Rastrea y administra tus compras recientes</p>
+  </div>
+
+  @if (loading()) {
+  <div class="flex flex-col items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+    <p class="text-gray-500 dark:text-gray-400">Cargando tu historial de pedidos...</p>
+  </div>
+  } @else if (orders().length === 0) {
+  <div
+    class="flex flex-col items-center justify-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 text-center">
+    <div class="h-24 w-24 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+      <span class="material-symbols-outlined text-gray-300 dark:text-gray-600 text-5xl">package_2</span>
+    </div>
+    <h2 class="text-2xl font-bold text-[#111318] dark:text-white mb-2">Aún no hay pedidos</h2>
+    <p class="text-gray-500 dark:text-gray-400 mb-8 max-w-sm">No has realizado ningún pedido. Echa un vistazo a nuestros
+      productos para empezar.</p>
+    <a routerLink="/products"
+      class="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 text-decoration-none">
+      <span class="material-symbols-outlined">storefront</span>
+      Ver Catálogo
+    </a>
+  </div>
+  } @else {
+  <div class="space-y-6">
+    @for (order of orders(); track order.id) {
+    <div
+      class="bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 overflow-hidden hover:border-primary/30 transition-colors shadow-sm">
+      <!-- Cabecera del pedido -->
+      <div
+        class="p-6 border-b border-gray-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex items-center gap-4">
+          <div class="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined">receipt_long</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-[#111318] dark:text-white">Pedido #{{ order.id }}</h3>
+            <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+              <span class="material-symbols-outlined text-[16px]">schedule</span>
+              {{ order.createdAt | date:'mediumDate' }} • {{ order.createdAt | date:'shortTime' }}
+            </div>
+          </div>
+        </div>
+        <div
+          [class]="'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ' + getStatusClass(order.status)">
+          {{ getStatusLabel(order.status) }}
+        </div>
+      </div>
+
+      <!-- Artículos del pedido -->
+      <div class="p-6 bg-gray-50/50 dark:bg-slate-800/20">
+        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Artículos Pedidos</h4>
+        <div class="space-y-3">
+          @for (item of order.items; track item.id) {
+          <div
+            class="flex justify-between items-center bg-white dark:bg-slate-900 p-3 rounded-lg border border-gray-100 dark:border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="text-sm font-medium text-[#111318] dark:text-white">
+                {{ item.product.brand }} <span class="text-primary">{{ item.product.model }}</span>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                x{{ item.quantity }}
+              </div>
+            </div>
+            <div class="text-sm font-bold text-[#111318] dark:text-white font-mono">
+              {{ (parseFloat(item.price) * item.quantity).toFixed(2) }}€
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Pie de página del pedido -->
+      <div
+        class="p-4 bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 flex justify-end items-center gap-3">
+        <span class="text-sm text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider">Total</span>
+        <span class="text-xl font-bold text-primary">{{ order.total }}€</span>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>

@@ -1,0 +1,81 @@
+services:
+  # Base de datos PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: proyecto-llaves-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-llaves_db}
+      POSTGRES_USER: ${POSTGRES_USER:-llaves_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-llaves_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - llaves-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-llaves_user} -d ${POSTGRES_DB:-llaves_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PHP-FPM para Symfony
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: proyecto-llaves-php
+    volumes:
+      - ./backend:/var/www/backend
+      - ./docker/php/entrypoint-dev.sh:/usr/local/bin/entrypoint.sh
+    entrypoint: ["/bin/sh", "/usr/local/bin/entrypoint.sh"]
+    environment:
+      DATABASE_URL: "postgresql://llaves_user:llaves_password@db:5432/llaves_db?serverVersion=16&charset=utf8"
+      APP_ENV: dev
+      APP_SECRET: cambiar_este_secreto_en_produccion
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - llaves-network
+    
+
+  # Nginx para el Backend API
+  nginx:
+    image: nginx:alpine
+    container_name: proyecto-llaves-nginx
+    volumes:
+      - ./backend:/var/www/backend
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - php
+    networks:
+      - llaves-network
+
+  # Angular Frontend (Desarrollo)
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/angular/Dockerfile
+      target: development
+    container_name: proyecto-llaves-frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "4200:4200"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - llaves-network
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
+
+networks:
+  llaves-network:
+    driver: bridge

@@ -1,0 +1,55 @@
+<div class="w-full max-w-4xl mx-auto">
+  <div class="text-center mb-10">
+    <h2 class="text-primary text-sm font-black uppercase tracking-widest mb-2">Ayuda & Soporte</h2>
+    <h3 class="text-[#111318] dark:text-white text-3xl md:text-4xl font-black leading-tight">Preguntas Frecuentes</h3>
+  </div>
+
+  @if (isLoading()) {
+  <div class="flex flex-col items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+    <p class="mt-4 text-[#616f89] dark:text-gray-400 font-medium text-sm">Cargando preguntas frecuentes...</p>
+  </div>
+  } @else if (faqs().length > 0) {
+  <div class="space-y-4">
+    @for (faq of faqs(); track faq.id) {
+    <div
+      class="bg-white dark:bg-slate-900 rounded-xl border border-[#dbdfe6] dark:border-slate-800 overflow-hidden transition-all duration-300 hover:border-primary/50"
+      [class.ring-2]="expandedFaq() === faq.id" [class.ring-primary/20]="expandedFaq() === faq.id"
+      [class.dark:ring-primary/20]="expandedFaq() === faq.id">
+
+      <button (click)="toggleFaq(faq.id!)"
+        class="w-full px-6 py-5 flex items-center justify-between gap-4 text-left bg-transparent hover:bg-gray-50 dark:hover:bg-white/5 transition-colors focus:outline-none group">
+        <span class="font-bold text-lg text-[#111318] dark:text-white group-hover:text-primary transition-colors">
+          {{ faq.question }}
+        </span>
+        <span
+          class="flex-shrink-0 h-8 w-8 rounded-full bg-gray-100 dark:bg-slate-800 flex items-center justify-center transition-colors group-hover:bg-primary/10">
+          <span
+            class="material-symbols-outlined text-gray-500 dark:text-gray-400 group-hover:text-primary transition-transform duration-300"
+            [class.rotate-45]="expandedFaq() === faq.id" [class.rotate-0]="expandedFaq() !== faq.id">
+            add
+          </span>
+        </span>
+      </button>
+
+      @if (expandedFaq() === faq.id) {
+      <div class="px-6 pb-6 pt-0 animate-fadeIn">
+        <p
+          class="text-[#616f89] dark:text-gray-400 leading-relaxed text-base pt-2 border-t border-gray-100 dark:border-slate-800">
+          {{ faq.answer }}
+        </p>
+      </div>
+      }
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="bg-white dark:bg-slate-900 rounded-xl border border-[#dbdfe6] dark:border-slate-800 p-8 text-center">
+    <div class="h-16 w-16 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+      <span class="material-symbols-outlined text-gray-400 dark:text-gray-500 text-3xl">help_outline</span>
+    </div>
+    <p class="text-[#616f89] dark:text-gray-400 font-medium">No hay preguntas frecuentes disponibles en este momento.
+    </p>
+  </div>
+  }
+</div>

@@ -1,0 +1,67 @@
+services:
+  # Base de datos PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: proyecto-llaves-db-prod
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - llaves-network
+    restart: unless-stopped
+
+  # PHP-FPM para Symfony
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: proyecto-llaves-php-prod
+    volumes:
+      - ./backend:/var/www/backend
+    environment:
+      DATABASE_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?serverVersion=16&charset=utf8"
+      APP_ENV: prod
+      APP_SECRET: ${APP_SECRET}
+    depends_on:
+      - db
+    networks:
+      - llaves-network
+    restart: unless-stopped
+
+  # Nginx para el Backend API
+  nginx-backend:
+    image: nginx:alpine
+    container_name: proyecto-llaves-nginx-backend-prod
+    volumes:
+      - ./backend:/var/www/backend
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - php
+    networks:
+      - llaves-network
+    restart: unless-stopped
+
+  # Angular Frontend (Producción)
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/angular/Dockerfile
+      target: production
+    container_name: proyecto-llaves-frontend-prod
+    ports:
+      - "8000:80"
+    networks:
+      - llaves-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  llaves-network:
+    driver: bridge

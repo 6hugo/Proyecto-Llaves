@@ -1,0 +1,117 @@
+<div class="max-w-[1440px] mx-auto px-6 md:px-10 lg:px-40 py-12">
+  <div class="mb-10">
+    <h1 class="text-[#111318] dark:text-white text-4xl font-black leading-tight tracking-tight">Carrito de Compras</h1>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">Administra tus artículos y procede al pago</p>
+  </div>
+
+  @if (cartService.items().length === 0) {
+  <div
+    class="flex flex-col items-center justify-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 text-center">
+    <div class="h-24 w-24 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+      <span class="material-symbols-outlined text-gray-300 dark:text-gray-600 text-5xl">shopping_cart_off</span>
+    </div>
+    <h2 class="text-2xl font-bold text-[#111318] dark:text-white mb-2">Tu carrito está vacío</h2>
+    <p class="text-gray-500 dark:text-gray-400 mb-8 max-w-sm">Parece que aún no has añadido nada a tu carrito.</p>
+    <a routerLink="/products"
+      class="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 text-decoration-none">
+      <span class="material-symbols-outlined">storefront</span>
+      Empezar a Comprar
+    </a>
+  </div>
+  } @else {
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+    <div class="lg:col-span-2 space-y-4">
+      @for (item of cartService.items(); track item.product.id) {
+      <div
+        class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-6 border border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row gap-6 items-center sm:items-start group hover:border-primary/30 transition-colors">
+        <div class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-gray-100 dark:bg-slate-800 rounded-lg overflow-hidden">
+          <img [src]="getImageUrl(item.product.imageUrl)" [alt]="item.product.brand" class="w-full h-full object-cover">
+        </div>
+
+        <div class="flex-grow text-center sm:text-left w-full">
+          <div class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
+            <div>
+              <h3 class="text-lg font-bold text-[#111318] dark:text-white">
+                {{ item.product.brand }} <span class="text-primary">{{ item.product.model }}</span>
+              </h3>
+              <p class="text-gray-500 dark:text-gray-400 text-sm">Año: {{ item.product.year }}</p>
+            </div>
+            <div class="text-lg font-bold text-[#111318] dark:text-white">
+              {{ item.product.price }}€
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
+            <div class="flex items-center border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
+              <button (click)="updateQuantity(item.product.id!, item.quantity - 1)"
+                class="p-2 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-500 transition-colors disabled:opacity-50"
+                [disabled]="item.quantity <= 1">
+                <span class="material-symbols-outlined text-sm">remove</span>
+              </button>
+              <div
+                class="w-10 text-center text-sm font-bold text-[#111318] dark:text-white bg-white dark:bg-slate-900 py-2">
+                {{ item.quantity }}
+              </div>
+              <button (click)="updateQuantity(item.product.id!, item.quantity + 1)"
+                class="p-2 hover:bg-gray-50 dark:hover:bg-slate-800 text-gray-500 transition-colors disabled:opacity-50"
+                [disabled]="item.quantity >= item.product.stock">
+                <span class="material-symbols-outlined text-sm">add</span>
+              </button>
+            </div>
+
+            <button (click)="removeItem(item.product.id!)"
+              class="text-red-500 hover:text-red-700 text-sm font-semibold flex items-center gap-1 transition-colors">
+              <span class="material-symbols-outlined text-lg">delete</span>
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <div class="lg:col-span-1">
+      <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-gray-100 dark:border-slate-800 sticky top-24">
+        <h2 class="text-xl font-bold text-[#111318] dark:text-white mb-6">Resumen del Pedido</h2>
+
+        <div class="space-y-4 mb-6">
+          <div class="flex justify-between text-gray-600 dark:text-gray-400">
+            <span>Subtotal ({{ cartService.itemCount() }} artículos)</span>
+            <span>{{ cartService.total().toFixed(2) }}€</span>
+          </div>
+          <div class="h-px bg-gray-100 dark:bg-slate-800"></div>
+          <div class="flex justify-between text-lg font-bold text-[#111318] dark:text-white">
+            <span>Total</span>
+            <span class="text-primary">{{ cartService.total().toFixed(2) }}€</span>
+          </div>
+        </div>
+
+        @if (orderMessage()) {
+        <div class="mb-6 p-4 rounded-lg text-sm font-medium border" [class.bg-green-50]="orderSuccess()"
+          [class.text-green-700]="orderSuccess()" [class.border-green-200]="orderSuccess()"
+          [class.bg-red-50]="!orderSuccess()" [class.text-red-700]="!orderSuccess()"
+          [class.border-red-200]="!orderSuccess()">
+          {{ orderMessage() }}
+        </div>
+        }
+
+        <button (click)="checkout()" [disabled]="processing() || cartService.items().length === 0"
+          class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 px-6 rounded-lg shadow-lg shadow-primary/20 transition-all mb-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+          @if(processing()) {
+          <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+          Procesando...
+          } @else {
+          <span class="material-symbols-outlined">credit_card</span>
+          Finalizar Compra
+          }
+        </button>
+
+        <button (click)="clearCart()"
+          class="w-full py-2 text-sm font-semibold text-gray-500 hover:text-red-500 transition-colors">
+          Vaciar Carrito
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

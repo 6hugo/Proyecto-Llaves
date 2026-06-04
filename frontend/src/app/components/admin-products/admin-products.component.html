@@ -1,0 +1,188 @@
+<div class="max-w-[1440px] mx-auto px-4 lg:px-8 py-8">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-black tracking-tight text-[#111318] dark:text-white">Administración de Productos</h1>
+      <p class="text-sm text-[#616f89] dark:text-gray-400">Gestiona tu inventario de productos</p>
+    </div>
+    <button (click)="openModal()"
+      class="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm">
+      <span class="material-symbols-outlined text-lg">add</span>
+      Nuevo Producto
+    </button>
+  </div>
+
+  @if (loading()) {
+  <div class="flex flex-col items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+    <p class="mt-4 text-[#616f89] font-medium text-sm">Cargando inventario...</p>
+  </div>
+  } @else {
+  @if (products().length === 0) {
+  <div
+    class="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#1a212e] rounded-xl border border-[#dbdfe6] dark:border-[#333] border-dashed">
+    <div class="h-16 w-16 bg-gray-50 dark:bg-[#111318] rounded-full flex items-center justify-center mb-4">
+      <span class="material-symbols-outlined text-gray-400 text-3xl">inventory_2</span>
+    </div>
+    <h3 class="text-[#111318] dark:text-white text-lg font-bold mb-1">No se encontraron productos</h3>
+    <p class="text-[#616f89] dark:text-gray-400 text-sm mb-6 text-center max-w-sm">
+      Tu inventario está vacío. Añade tu primer producto para empezar.
+    </p>
+    <button (click)="openModal()" class="text-primary font-bold text-sm hover:underline">
+      Añadir Producto Ahora
+    </button>
+  </div>
+  } @else {
+  <div
+    class="bg-white dark:bg-[#1a212e] rounded-xl border border-[#dbdfe6] dark:border-[#333] shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-gray-50 dark:bg-[#111318] border-b border-[#dbdfe6] dark:border-[#333]">
+          <tr>
+            <th class="px-6 py-4 font-bold text-[#111318] dark:text-white w-20">ID</th>
+            <th class="px-6 py-4 font-bold text-[#111318] dark:text-white">Marca y Modelo</th>
+            <th class="px-6 py-4 font-bold text-[#111318] dark:text-white">Año</th>
+            <th class="px-6 py-4 font-bold text-[#111318] dark:text-white">Precio</th>
+            <th class="px-6 py-4 font-bold text-[#111318] dark:text-white">Stock</th>
+            <th class="px-6 py-4 font-bold text-[#111318] dark:text-white text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#dbdfe6] dark:divide-[#333]">
+          @for (product of products(); track product.id) {
+          <tr class="hover:bg-gray-50 dark:hover:bg-[#111318]/50 transition-colors group">
+            <td class="px-6 py-4 font-mono text-[#616f89] dark:text-gray-400 text-xs">#{{ product.id }}</td>
+            <td class="px-6 py-4">
+              <div class="flex flex-col">
+                <span class="font-bold text-[#111318] dark:text-white">{{ product.brand }}</span>
+                <span class="text-[#616f89] dark:text-gray-400 text-xs">{{ product.model }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-[#111318] dark:text-white">{{ product.year }}</td>
+            <td class="px-6 py-4 font-bold text-primary">{{ product.price }}€</td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                [class.bg-green-50]="product.stock > 5" [class.text-green-700]="product.stock > 5"
+                [class.border-green-200]="product.stock > 5"
+                [class.bg-yellow-50]="product.stock > 0 && product.stock <= 5"
+                [class.text-yellow-700]="product.stock > 0 && product.stock <= 5"
+                [class.border-yellow-200]="product.stock > 0 && product.stock <= 5"
+                [class.bg-red-50]="product.stock === 0" [class.text-red-700]="product.stock === 0"
+                [class.border-red-200]="product.stock === 0">
+                {{ product.stock === 0 ? 'Agotado' : product.stock + ' unidades' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <button (click)="openModal(product)"
+                  class="p-2 text-[#616f89] hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                  title="Editar">
+                  <span class="material-symbols-outlined text-[20px]">edit</span>
+                </button>
+                <button (click)="deleteProduct(product.id!)"
+                  class="p-2 text-[#616f89] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors"
+                  title="Eliminar">
+                  <span class="material-symbols-outlined text-[20px]">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
+  }
+
+  <!-- Modal -->
+  @if (showModal()) {
+  <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Capa de fondo superpuesta -->
+      <div class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" aria-hidden="true"
+        (click)="closeModal()"></div>
+
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+      <div
+        class="relative inline-block align-bottom bg-white dark:bg-[#1a212e] rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full border border-[#dbdfe6] dark:border-[#333]">
+        <div
+          class="px-6 py-5 border-b border-[#dbdfe6] dark:border-[#333] flex justify-between items-center bg-gray-50 dark:bg-[#111318]">
+          <h3 class="text-lg font-bold text-[#111318] dark:text-white flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">inventory_2</span>
+            {{ editingProduct() ? 'Editar Producto' : 'Nuevo Producto' }}
+          </h3>
+          <button (click)="closeModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="px-6 py-6">
+          <form (ngSubmit)="saveProduct()" id="productForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="brand" class="block text-sm font-medium text-[#111318] dark:text-white mb-1">Marca</label>
+                <input [(ngModel)]="formData.brand" name="brand" type="text" required id="brand"
+                  class="block w-full px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary sm:text-sm shadow-sm"
+                  placeholder="Ej. Audi">
+              </div>
+
+              <div>
+                <label for="model" class="block text-sm font-medium text-[#111318] dark:text-white mb-1">Modelo</label>
+                <input [(ngModel)]="formData.model" name="model" type="text" required id="model"
+                  class="block w-full px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary sm:text-sm shadow-sm"
+                  placeholder="Ej. A3">
+              </div>
+
+              <div>
+                <label for="year" class="block text-sm font-medium text-[#111318] dark:text-white mb-1">Año</label>
+                <input [(ngModel)]="formData.year" name="year" type="number" required id="year"
+                  class="block w-full px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary sm:text-sm shadow-sm">
+              </div>
+
+              <div>
+                <label for="price" class="block text-sm font-medium text-[#111318] dark:text-white mb-1">Precio
+                  (€)</label>
+                <input [(ngModel)]="formData.price" name="price" type="number" step="0.01" required id="price"
+                  class="block w-full px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary sm:text-sm shadow-sm">
+              </div>
+
+              <div>
+                <label for="stock" class="block text-sm font-medium text-[#111318] dark:text-white mb-1">Stock</label>
+                <input [(ngModel)]="formData.stock" name="stock" type="number" required id="stock"
+                  class="block w-full px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary sm:text-sm shadow-sm">
+              </div>
+            </div>
+
+            <div>
+              <label for="imageUrl" class="block text-sm font-medium text-[#111318] dark:text-white mb-1">URL de la
+                Imagen</label>
+              <input [(ngModel)]="formData.imageUrl" name="imageUrl" type="text" id="imageUrl"
+                class="block w-full px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary sm:text-sm shadow-sm"
+                placeholder="https://...">
+            </div>
+
+            <div>
+              <label for="description"
+                class="block text-sm font-medium text-[#111318] dark:text-white mb-1">Descripción</label>
+              <textarea [(ngModel)]="formData.description" name="description" rows="3" id="description"
+                class="block w-full px-3 py-2 border border-[#dbdfe6] dark:border-[#333] rounded-lg bg-white dark:bg-[#111318] text-[#111318] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary sm:text-sm shadow-sm"></textarea>
+            </div>
+          </form>
+        </div>
+
+        <div
+          class="px-6 py-4 border-t border-[#dbdfe6] dark:border-[#333] bg-gray-50 dark:bg-[#111318] flex justify-end gap-3">
+          <button type="button" (click)="closeModal()"
+            class="px-4 py-2 bg-white dark:bg-[#1a212e] border border-[#dbdfe6] dark:border-[#333] rounded-lg text-sm font-medium text-[#616f89] hover:bg-gray-50 hover:text-[#111318] transition-colors shadow-sm">
+            Cancelar
+          </button>
+          <button type="submit" form="productForm"
+            class="px-4 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-sm">
+            Guardar Producto
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

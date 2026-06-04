@@ -1,0 +1,115 @@
+<div class="max-w-[1440px] mx-auto px-4 lg:px-8 py-8">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-black tracking-tight text-[#111318] dark:text-white">Administración de Pedidos</h1>
+      <p class="text-sm text-[#616f89] dark:text-gray-400">Gestiona los pedidos y estados de los clientes</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+  <div class="flex flex-col items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+    <p class="mt-4 text-[#616f89] font-medium text-sm">Cargando pedidos...</p>
+  </div>
+  } @else {
+  @if (orders().length === 0) {
+  <div
+    class="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#1a212e] rounded-xl border border-[#dbdfe6] dark:border-[#333] border-dashed">
+    <div class="h-16 w-16 bg-gray-50 dark:bg-[#111318] rounded-full flex items-center justify-center mb-4">
+      <span class="material-symbols-outlined text-gray-400 text-3xl">shopping_cart_off</span>
+    </div>
+    <h3 class="text-[#111318] dark:text-white text-lg font-bold mb-1">No se encontraron pedidos</h3>
+    <p class="text-[#616f89] dark:text-gray-400 text-sm mb-6 text-center max-w-sm">
+      Actualmente no hay pedidos en el sistema.
+    </p>
+  </div>
+  } @else {
+  <div class="space-y-6">
+    @for (order of orders(); track order.id) {
+    <div
+      class="bg-white dark:bg-[#1a212e] rounded-xl border border-[#dbdfe6] dark:border-[#333] shadow-sm overflow-hidden">
+      <!-- Cabecera del pedido -->
+      <div
+        class="p-5 border-b border-[#dbdfe6] dark:border-[#333] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <span class="text-lg font-bold text-[#111318] dark:text-white">Pedido #{{ order.id }}</span>
+            <span
+              class="text-xs font-mono text-[#616f89] dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-[#111318] rounded">{{
+              order.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <p class="text-sm text-[#616f89] dark:text-gray-400 mt-1 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">person</span>
+            {{ order.user?.email || 'Usuario Invitado' }}
+          </p>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <select [(ngModel)]="order.status" (change)="updateStatus(order)"
+            class="block w-40 px-3 py-2 text-sm border-0 rounded-lg font-medium focus:ring-2 focus:ring-primary/50 cursor-pointer"
+            [ngClass]="{
+                  'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-200': order.status === 'pending',
+                  'bg-blue-50 text-blue-700 ring-1 ring-blue-200': order.status === 'confirmed',
+                  'bg-purple-50 text-purple-700 ring-1 ring-purple-200': order.status === 'shipped',
+                  'bg-green-50 text-green-700 ring-1 ring-green-200': order.status === 'completed',
+                  'bg-red-50 text-red-700 ring-1 ring-red-200': order.status === 'cancelled'
+                }">
+            <option value="pending">Pendiente</option>
+            <option value="confirmed">Confirmado</option>
+            <option value="shipped">Enviado</option>
+            <option value="completed">Completado</option>
+            <option value="cancelled">Cancelado</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Artículos del pedido -->
+      <div class="p-5 bg-gray-50/50 dark:bg-[#111318]/50">
+        <h4 class="text-xs font-bold text-[#616f89] dark:text-gray-400 uppercase tracking-wider mb-3">Artículos</h4>
+        <div class="overflow-x-auto rounded-lg border border-[#dbdfe6] dark:border-[#333] bg-white dark:bg-[#1a212e]">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 dark:bg-[#111318] border-b border-[#dbdfe6] dark:border-[#333]">
+              <tr>
+                <th class="px-4 py-3 font-semibold text-[#111318] dark:text-white">Producto</th>
+                <th class="px-4 py-3 font-semibold text-[#111318] dark:text-white text-center">Cant.</th>
+                <th class="px-4 py-3 font-semibold text-[#111318] dark:text-white text-right">Precio</th>
+                <th class="px-4 py-3 font-semibold text-[#111318] dark:text-white text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#dbdfe6] dark:divide-[#333]">
+              @for (item of order.items; track item.id) {
+              <tr>
+                <td class="px-4 py-3">
+                  <div class="font-medium text-[#111318] dark:text-white">{{ item.product.brand }} {{ item.product.model
+                    }}</div>
+                </td>
+                <td class="px-4 py-3 text-center text-[#616f89] dark:text-gray-400">{{ item.quantity }}</td>
+                <td class="px-4 py-3 text-right text-[#616f89] dark:text-gray-400">{{ item.price }}€</td>
+                <td class="px-4 py-3 text-right font-medium text-[#111318] dark:text-white">{{ (parseFloat(item.price) *
+                  item.quantity).toFixed(2) }}€</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pie de página del pedido -->
+      <div
+        class="p-5 border-t border-[#dbdfe6] dark:border-[#333] flex justify-between items-center bg-white dark:bg-[#1a212e]">
+        <button (click)="deleteOrder(order.id!)"
+          class="text-red-600 hover:text-red-700 text-xs font-bold hover:underline flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">delete</span>
+          Eliminar Pedido
+        </button>
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-medium text-[#616f89] dark:text-gray-400 uppercase">Monto Total</span>
+          <span class="text-xl font-black text-[#111318] dark:text-white">{{ order.total }}€</span>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+  }
+</div>
