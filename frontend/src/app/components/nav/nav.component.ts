@@ -16,6 +16,7 @@ export class NavComponent {
   private router = inject(Router);
 
   showAdminMenu = signal(false);
+  isMobileMenuOpen = signal(false);
 
   toggleAdminMenu() {
     this.showAdminMenu.set(!this.showAdminMenu());
@@ -23,6 +24,14 @@ export class NavComponent {
 
   closeAdminMenu() {
     this.showAdminMenu.set(false);
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen.set(false);
   }
 
   logout() {
