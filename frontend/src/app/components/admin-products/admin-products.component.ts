@@ -74,7 +74,7 @@ export class AdminProductsComponent implements OnInit {
       brand: this.formData.brand,
       model: this.formData.model,
       year: parseInt(this.formData.year),
-      price: this.formData.price.toString(),
+      price: this.formData.price.toString().replace(',', '.'),
       stock: parseInt(this.formData.stock),
       description: this.formData.description,
       imageUrl: this.formData.imageUrl

@@ -103,7 +103,19 @@ export class ProductCatalogComponent implements OnInit {
       return imageUrl;
     }
 
-    // 3. Unimos el dominio de placehold.co con el texto de tu base de datos
+    // 3. Si es una ruta relativa de assets
+    if (imageUrl.startsWith('/assets') || imageUrl.startsWith('assets/')) {
+      return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+    }
+
+    // 4. Si es una ruta de subida de la API (por ejemplo, uploads/...)
+    if (imageUrl.startsWith('/uploads') || imageUrl.startsWith('uploads/')) {
+      const backendUrl = environment.apiUrl.replace(/\/api$/, '');
+      const cleanPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+      return `${backendUrl}${cleanPath}`;
+    }
+
+    // 5. Unimos el dominio de placehold.co con el texto de tu base de datos
     return `https://placehold.co/${imageUrl}`;
   }
 

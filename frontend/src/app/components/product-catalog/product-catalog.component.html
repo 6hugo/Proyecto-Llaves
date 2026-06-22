@@ -42,28 +42,36 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         @for (product of products(); track product.id) {
         <div
-          class="group bg-white dark:bg-background-dark rounded-xl border border-[#dbdfe6] dark:border-[#333] overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-shadow">
-          <div class="aspect-square bg-[#f9fafb] dark:bg-[#1a212e] flex items-center justify-center p-8 relative">
+          class="group bg-white dark:bg-[#161f30] rounded-2xl border border-[#dbdfe6]/70 dark:border-[#2a3547] overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all duration-300">
+          <div class="relative w-full h-52 bg-[#f9fafb] dark:bg-[#1a212e] overflow-hidden">
             <img [src]="getImageUrl(product.imageUrl)" [alt]="product.brand + ' ' + product.model"
-              class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300">
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
             <span
-              class="absolute top-3 left-3 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded">{{
-              product.year }}</span>
+              class="absolute top-3 right-3 bg-white/95 dark:bg-[#1a212e]/95 text-gray-800 dark:text-gray-200 text-xs font-semibold px-2 py-1 rounded shadow-sm">
+              {{ product.year }}
+            </span>
           </div>
           <div class="p-5 flex flex-col flex-1">
-            <h3 class="text-[#111318] dark:text-white text-base font-bold leading-snug mb-1">{{ product.brand }} {{
-              product.model }}</h3>
-            <p class="text-[#616f89] text-xs mb-4 line-clamp-2">{{ product.description }}</p>
-            <div class="mt-auto flex items-center justify-between gap-3">
-              <span class="text-primary font-black text-lg">{{ product.price }}€</span>
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="text-[#111318] dark:text-white text-lg font-bold leading-tight">
+                {{ product.brand }} {{ product.model }}
+              </h3>
+              <span class="text-[#111318] dark:text-white font-bold text-lg leading-tight">
+                {{ product.price }}€
+              </span>
+            </div>
+            <p class="text-[#616f89] dark:text-gray-400 text-xs mb-4 line-clamp-2 leading-relaxed">
+              {{ product.description }}
+            </p>
+            <div class="mt-auto flex justify-start">
               @if(product.stock > 0) {
               <button (click)="addToCart(product)"
-                class="flex items-center justify-center rounded-lg h-9 px-4 bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-all border-0">
+                class="flex items-center justify-center rounded-xl h-10 px-5 bg-[#8ea0cc] hover:bg-[#7d8fbb] text-white text-xs font-bold transition-all border-0 shadow-sm">
                 Añadir al Carrito
               </button>
               } @else {
               <button disabled
-                class="flex items-center justify-center rounded-lg h-9 px-4 bg-gray-100 text-gray-400 text-xs font-bold cursor-not-allowed border-0">
+                class="flex items-center justify-center rounded-xl h-10 px-5 bg-gray-100 dark:bg-gray-800 text-gray-400 text-xs font-bold cursor-not-allowed border-0">
                 Agotado
               </button>
               }

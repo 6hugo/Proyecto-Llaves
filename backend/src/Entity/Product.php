@@ -70,7 +70,7 @@ class Product
     #[Groups(['product:read', 'product:write'])]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 2000, nullable: true)]
     #[Groups(['product:read', 'product:write', 'order:read'])]
     private ?string $imageUrl = null;
 

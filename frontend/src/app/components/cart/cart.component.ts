@@ -46,7 +46,14 @@ export class CartComponent {
       return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
     }
 
-    // 4. Por defecto, usamos el servicio de placeholders con el texto de la BD
+    // 4. Si es una ruta de subida de la API (por ejemplo, uploads/...)
+    if (imageUrl.startsWith('/uploads') || imageUrl.startsWith('uploads/')) {
+      const backendUrl = environment.apiUrl.replace(/\/api$/, '');
+      const cleanPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+      return `${backendUrl}${cleanPath}`;
+    }
+
+    // 5. Por defecto, usamos el servicio de placeholders con el texto de la BD
     return `https://placehold.co/${imageUrl}`;
   }
 
